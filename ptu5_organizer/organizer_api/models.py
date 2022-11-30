@@ -49,6 +49,7 @@ class Hashtag(models.Model):
         on_delete=models.CASCADE,
         related_name='hashtags'
     )
+    hashtags = models.TextField(_('hashtags'), max_length=1000)
     user = models.ForeignKey(
         User,
         verbose_name=_('user'),
@@ -57,7 +58,7 @@ class Hashtag(models.Model):
     )
 
     def __str__(self) -> str:
-        return _('Hashtag for {photo_id}').format(
+        return _('Hashtags for {photo_id}').format(
             photo_id=self.id,
             user=self.user
         )
