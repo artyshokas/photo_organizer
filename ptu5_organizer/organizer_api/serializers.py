@@ -20,17 +20,19 @@ class HashtagSerializer(serializers.ModelSerializer):
         fields = ('id', 'photo', 'hashtags', 'user', 'user_id')
 
 
-class AlbumPhotoCommentSerializer(serializers.ModelSerializer):
-    user = serializers.ReadOnlyField(source='user.username')
-    user_id = serializers.ReadOnlyField(source='user.id')
-    hashtags = HashtagSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = models.AlbumPhotoComment
-        fields = ('id', 'comment', 'photo', 'user', 'user_id', 'attached_at', 'hashtags')
-
-
 class AlbumPhotoCommentLikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.AlbumPhotoCommentLike
         fields = ('id', )
+
+
+class AlbumPhotoCommentSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source='user.username')
+    user_id = serializers.ReadOnlyField(source='user.id')
+    hashtags = HashtagSerializer(many=True, read_only=True)
+    likes = AlbumPhotoCommentLikeSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = models.AlbumPhotoComment
+        fields = ('id', 'comment', 'photo', 'user', 'user_id', 'attached_at', 'hashtags', 'likes')
+
