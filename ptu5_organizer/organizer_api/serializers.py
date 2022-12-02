@@ -7,7 +7,7 @@ User = get_user_model()
 class AlbumSerializer(serializers.ModelSerializer):
     class Meta:
         model= models.Album
-        fields = ('id', 'name', 'description', )
+        fields = ('id', 'name', 'description')
 
 
 class HashtagSerializer(serializers.ModelSerializer):
