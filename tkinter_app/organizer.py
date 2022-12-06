@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 from PIL import ImageTk, Image
 import requests
 import json
@@ -9,6 +9,105 @@ def album_details():
     root = Toplevel(organizer)
     root.title('album details')
     root.geometry('800x600')
+
+    URL = 'http://127.0.0.1:8000/'
+
+    def get_album_list():
+        album_list.delete(0, END)
+        pk = selected_item[0]
+        r = requests.get(f"http://127.0.0.1:8000/album/{pk}/photos")
+        req_data = json.loads(r.text)
+        data = []
+        for i in req_data:
+            res = i.values()
+            data.append(list(res))
+        for d in data:
+            album_list.insert(END, d)
+
+
+    def select(event):
+        try:
+            global selected
+            index = album_list.curselection()[0]
+            selected = album_list.get(index)
+            comment_entry.delete(0, END)
+            comment_entry.insert(END, selected[1])
+        except Exception as e:
+            print(e)
+
+    def view_photo():
+        global photo
+        selected_path = selected[2]
+        selected_photo = selected_path[39:]
+        photo = PhotoImage(file=f"C:\\Users\\Artiom\\python_ptu5\\photo_organizer\\ptu5_organizer\\media\\user_photos\\{selected_photo}")
+        photo_field.image_create(END, image=photo)
+
+    def upload_file():
+        global filename, img
+        f_types =[('Png files','*.png'),('Jpg Files', '*.jpg')]
+        filename = filedialog.askopenfilename(filetypes=f_types)
+        img = ImageTk.PhotoImage(file=filename)
+
+    def update():
+        try:
+            if token:
+                if comment_text.get() == '':
+                    messagebox.showerror('Please fill in all fields')
+                else:
+                    pk = selected_item[0]
+                    data = {
+                        "comment": comment_text.get(),
+                        }
+                    # Photo?!?!
+                    headers = {
+                        "Content-Type": "application/json",
+                        "Authorization": f'Token {token}'
+                    }
+                    response = requests.put(f"http://127.0.0.1:8000/album/{pk}/photo", json=data, headers=headers)
+                    get_album_list()
+        except Exception as e:
+            print(e)
+
+
+
+
+
+
+    photo_field = Text(root, width=40, height=10)
+    photo_field.grid(row=3, column=5)
+
+    comment_text = StringVar()
+    comment_label = Label(root, text='Comment', font=('bold', 14), pady=20)
+    comment_label.grid(row=0, column=0)
+
+    comment_entry = Entry(root, textvariable=comment_text)
+    comment_entry.grid(row=0, column=1)
+
+    upload_button = Button(root, text='Upload photo', command=upload_file)
+    upload_button.grid(row=8, column=9)
+
+    add_photo_button = Button(root, text='Add photo', command=update)
+    add_photo_button.grid(row=9, column=9)
+
+
+    photo_button = Button(root, text='Photo', command=view_photo)
+    photo_button.grid(row=1, column=0)
+
+
+
+    album_list = Listbox(root, height=15, width=45, border=1)
+    album_list.grid(row=3, column=0, columnspan=3, rowspan=9, pady=20, padx=20, sticky=NSEW)
+
+    scrollbar = Scrollbar(root, orient=VERTICAL)
+    scrollbar.grid(row=4, column=2, sticky=NS)
+
+    album_list.configure(yscrollcommand=scrollbar.set)
+    scrollbar.configure(command=album_list.yview)
+
+    album_list.bind('<<ListboxSelect>>', select)
+
+    album_details_button = Button(root, text='View details', width=15, command=get_album_list)
+    album_details_button.grid(row=7, column=9, pady=20)
 
 def main_screen():
 
@@ -32,7 +131,6 @@ def main_screen():
                 data.append(list(res))
             for d in data:
                 album_list.insert(END, d)
-                print(get_list)
 
 
     def login():
@@ -54,8 +152,67 @@ def main_screen():
                 token = response_dict['token']
                 print(token)
             except Exception as e:
-                messagebox.showerror('Invalid Username or Password!')
+                messagebox.showerror('ERROR!')
             get_list()
+
+
+
+    def add():
+        try:
+            if token:
+                if album_text.get() == '' or albumdesc_text.get() == '':
+                    messagebox.showerror('Please fill in all fields')
+                else:
+                    address = 'http://127.0.0.1:8000/albums/'
+                    data = {
+                        "name": album_text.get(),
+                        "description": albumdesc_text.get()
+                        }
+                    headers = {
+                        "Content-Type": "application/json",
+                        "Authorization": f'Token {token}'
+                    }
+                    response = requests.post(address, json=data, headers=headers)
+                    album_list.delete(0, END)
+                    album_list.insert(END, (album_text.get(), albumdesc_text.get()))
+                    clear()
+                    get_list()
+        except Exception as e:
+            print(e)
+
+    
+    def update():
+        try:
+            if token:
+                if album_text.get() == '' or albumdesc_text.get() == '':
+                    messagebox.showerror('Please fill in all fields')
+                else:
+                    pk = selected_item[0]
+                    data = {
+                        "name": album_text.get(),
+                        "description": albumdesc_text.get()
+                        }
+                    headers = {
+                        "Content-Type": "application/json",
+                        "Authorization": f'Token {token}'
+                    }
+                    response = requests.put(f"http://127.0.0.1:8000/album/{pk}/", json=data, headers=headers)
+                    get_list()
+        except Exception as e:
+            print(e)
+
+
+    def select(event):
+        try:
+            global selected_item
+            index = album_list.curselection()[0]
+            selected_item = album_list.get(index)
+            album_entry.delete(0, END)
+            album_entry.insert(END, selected_item[1])
+            albumdesc_entry.delete(0, END)
+            albumdesc_entry.insert(END, selected_item[2])
+        except Exception as e:
+            print(e)
 
 
 
@@ -100,14 +257,14 @@ def main_screen():
     album_list.configure(yscrollcommand=scrollbar.set)
     scrollbar.configure(command=album_list.yview)
 
-    album_list.bind('<<ListboxSelect>>')
+    album_list.bind('<<ListboxSelect>>', select)
 
     login_button = Button(organizer, text='Login', fg='red', width=15, command=login)
-    addalbum_button = Button(organizer, text='Add album', width=15)
+    addalbum_button = Button(organizer, text='Add album', width=15, command=add)
     deletealbum_button = Button(organizer, text='Delete album', width=15)
-    updatealbum_button = Button(organizer, text='Update album', width=15)
+    updatealbum_button = Button(organizer, text='Update album', width=15, command=update)
     clear_button = Button(organizer, text='Clear', width=15, command=clear)
-    album_details_button = Button(organizer, text='View album', width=15)
+    album_details_button = Button(organizer, text='View album', width=15, command=album_details)
 
     login_button.grid(row=2, column=9, pady=20)
     addalbum_button.grid(row=3, column=9, pady=20)
