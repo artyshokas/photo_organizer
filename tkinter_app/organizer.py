@@ -1,8 +1,10 @@
 from tkinter import *
+from tkinter import filedialog
 from tkinter import messagebox, filedialog
 from PIL import ImageTk, Image
 import requests
 import json
+import os
 
 
 def album_details():
@@ -32,6 +34,7 @@ def album_details():
             selected = album_list.get(index)
             comment_entry.delete(0, END)
             comment_entry.insert(END, selected[1])
+            view_photo()
         except Exception as e:
             print(e)
 
@@ -42,23 +45,46 @@ def album_details():
         photo = PhotoImage(file=f"C:\\Users\\Artiom\\python_ptu5\\photo_organizer\\ptu5_organizer\\media\\user_photos\\{selected_photo}")
         photo_field.image_create(END, image=photo)
 
+
     def upload_file():
         global filename, img
         f_types =[('Png files','*.png'),('Jpg Files', '*.jpg')]
         filename = filedialog.askopenfilename(filetypes=f_types)
         img = ImageTk.PhotoImage(file=filename)
-        photo_field.image_create(END, image=img)
+        photo_upload_field.image_create(END, image=img)
+        print(filename)
 
-    def update():
+
+
+    def add():
         if token:
-            if comment_text.get() == '' or photo_field.get("1.0", END) == '':
+            if comment_text.get() == '':
                 messagebox.showerror('Please fill in all fields')
             else:
-                # upd_photo = filename[29:]
+                pk = selected[0]
+                post_files = {
+                     "photo": open(filename, "rb")
+                    }
+                data = {
+                    "comment": comment_text.get(),
+                    }
+                headers = {
+                    "Content-Type": "application/json",
+                    "Authorization": f'Token {token}'
+                }
+                response = requests.post(f"http://127.0.0.1:8000/album/{pk}/photos", data=data, files=post_files, headers=headers)
+                print(response)
+                get_album_list()
+
+
+    def update_comment():
+        if token:
+            if comment_text.get() == '':
+                messagebox.showerror('Please fill in all fields')
+            else:
                 pk = selected[0]
                 data = {
                     "comment": comment_text.get(),
-                    # "photo": "http://127.0.0.1:8000/media/user_photos/acespades.png",
                     }
                 headers = {
                     "Content-Type": "application/json",
@@ -67,10 +93,17 @@ def album_details():
                 response = requests.put(f"http://127.0.0.1:8000/photo/{pk}/", json=data, headers=headers)
                 get_album_list()
 
+    def clear():
+        comment_entry.delete(0, END)
+        photo_upload_field.delete(0, END)
+
 
 
     photo_field = Text(root, width=40, height=10)
     photo_field.grid(row=3, column=5)
+
+    photo_upload_field = Text(root, width=40, height=10)
+    photo_upload_field.grid(row=6, column=5)
 
     comment_text = StringVar()
     comment_label = Label(root, text='Comment', font=('bold', 14), pady=20)
@@ -82,8 +115,11 @@ def album_details():
     upload_button = Button(root, text='Upload photo', command=upload_file)
     upload_button.grid(row=8, column=9)
 
-    add_photo_button = Button(root, text='Add photo', command=update)
-    add_photo_button.grid(row=9, column=9)
+    update_comment_button = Button(root, text='Update comment', command=update_comment)
+    update_comment_button.grid(row=9, column=9)
+
+    add_button = Button(root, text='add photo', command=add)
+    add_button.grid(row=10, column=9)
 
 
     photo_button = Button(root, text='Photo', command=view_photo)

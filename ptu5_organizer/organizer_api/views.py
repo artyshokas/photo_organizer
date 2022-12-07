@@ -39,7 +39,7 @@ class AlbumPhotoCommentList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
-        album = models.Album.objects.get(pk=self.kwargs['pk'], user=self.request.user)
+        album = models.Album.objects.get(pk=self.kwargs['pk'])
         serializer.save(user=self.request.user, album=album)
 
     def get_queryset(self):
