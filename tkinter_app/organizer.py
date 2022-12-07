@@ -47,29 +47,25 @@ def album_details():
         f_types =[('Png files','*.png'),('Jpg Files', '*.jpg')]
         filename = filedialog.askopenfilename(filetypes=f_types)
         img = ImageTk.PhotoImage(file=filename)
+        photo_field.image_create(END, image=img)
 
     def update():
-        try:
-            if token:
-                if comment_text.get() == '':
-                    messagebox.showerror('Please fill in all fields')
-                else:
-                    pk = selected_item[0]
-                    data = {
-                        "comment": comment_text.get(),
-                        }
-                    # Photo?!?!
-                    headers = {
-                        "Content-Type": "application/json",
-                        "Authorization": f'Token {token}'
+        if token:
+            if comment_text.get() == '' or photo_field.get("1.0", END) == '':
+                messagebox.showerror('Please fill in all fields')
+            else:
+                # upd_photo = filename[29:]
+                pk = selected[0]
+                data = {
+                    "comment": comment_text.get(),
+                    # "photo": "http://127.0.0.1:8000/media/user_photos/acespades.png",
                     }
-                    response = requests.put(f"http://127.0.0.1:8000/album/{pk}/photo", json=data, headers=headers)
-                    get_album_list()
-        except Exception as e:
-            print(e)
-
-
-
+                headers = {
+                    "Content-Type": "application/json",
+                    "Authorization": f'Token {token}'
+                }
+                response = requests.put(f"http://127.0.0.1:8000/photo/{pk}/", json=data, headers=headers)
+                get_album_list()
 
 
 
@@ -273,7 +269,7 @@ def main_screen():
     clear_button.grid(row=6, column=9, pady=20)
     album_details_button.grid(row=7, column=9, pady=20)
 
-    organizer.title('band_api')
+    organizer.title('Photo Organizer')
     organizer.geometry('800x600')
 
     organizer.mainloop()

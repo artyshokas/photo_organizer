@@ -27,7 +27,7 @@ class AlbumDetail(generics.RetrieveUpdateDestroyAPIView):
             raise ValidationError(_('You can only delete your created albums'))
 
     def put(self, request, *args, **kwargs):
-        album = models.Album.objects.filter(pk=kwargs['pk'], user=self.request.user)
+        album = models.Album.objects.filter(pk=kwargs['pk'])
         if album.exists():
             return self.update(request, *args, **kwargs)
         else:
@@ -39,7 +39,7 @@ class AlbumPhotoCommentList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
-        album = models.Album.objects.get(pk=self.kwargs['pk'])
+        album = models.Album.objects.get(pk=self.kwargs['pk'], user=self.request.user)
         serializer.save(user=self.request.user, album=album)
 
     def get_queryset(self):
