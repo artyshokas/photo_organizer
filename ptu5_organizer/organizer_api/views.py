@@ -5,6 +5,7 @@ from rest_framework import generics, permissions, mixins, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from . import models, serializers
+import requests
 
 User = get_user_model()
 
@@ -20,7 +21,7 @@ class AlbumDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def delete(self, request, *args, **kwargs):
-        album = models.Album.objects.filter(pk=kwargs['pk'], user=self.request.user)
+        album = models.Album.objects.filter(pk=kwargs['pk'])
         if album.exists():
             return self.destroy(request, *args, **kwargs)
         else:
@@ -60,7 +61,7 @@ class AlbumPhotoCommentDetail(generics.RetrieveUpdateDestroyAPIView):
             raise ValidationError(_('You can delete only your uploaded photos'))
 
     def put(self, request, *args, **kwargs):
-        photo = models.AlbumPhotoComment.objects.filter(pk=kwargs['pk'], user=self.request.user)
+        photo = models.AlbumPhotoComment.objects.filter(pk=kwargs['pk'])
         if photo.exists():
             return self.update(request, *args, **kwargs)
         else:
