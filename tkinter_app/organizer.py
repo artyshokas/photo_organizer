@@ -1,9 +1,11 @@
 from tkinter import *
 from tkinter import filedialog
+from tkhtmlview import HTMLLabel
 from tkinter import messagebox, filedialog
 from PIL import ImageTk, Image
 import requests
 import json
+import os
 
 
 def album_details():
@@ -60,13 +62,11 @@ def album_details():
                 "comment": comment_text.get(),
                 }
             headers = {
-                "Content-Type": "application/json",
                 "Authorization": f'Token {token}'
-            }
+                }
             response = requests.post(f"http://127.0.0.1:8000/album/{pk}/photos", data=data, files=post_files, headers=headers)
             print(response)
             get_album_list()
-
 
     def update_comment():
             if comment_text.get() == '':
@@ -112,6 +112,13 @@ def album_details():
 
     add_button = Button(root, text='add photo', command=add)
     add_button.grid(row=10, column=9)
+
+    # add_photo = HTMLLabel(root, html="""
+    # <ul>
+    #     <li><a href='http://127.0.0.1:8000/album/1/photos'>Add photo</a></li>
+    # </ul>
+    # """)
+    # add_photo.grid(row=10, column=9)
 
 
     photo_button = Button(root, text='Photo', command=view_photo)
