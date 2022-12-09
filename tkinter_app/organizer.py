@@ -1,17 +1,15 @@
 from tkinter import *
 from tkinter import filedialog
-from tkhtmlview import HTMLLabel
 from tkinter import messagebox, filedialog
-from PIL import ImageTk, Image
+from PIL import ImageTk
 import requests
 import json
-import os
 
 
 def album_details():
     root = Toplevel(organizer)
     root.title('album details')
-    root.geometry('800x650')
+    #root.geometry('800x650')
 
     URL = 'http://127.0.0.1:8000/'
 
@@ -85,49 +83,39 @@ def album_details():
 
     def clear():
         comment_entry.delete(0, END)
-        photo_upload_field.delete(0, END)
+        photo_upload_field.delete(1.0, END)
 
 
-    photo_field = Text(root, width=40, height=10)
-    photo_field.grid(row=3, column=5)
+    photo_field = Text(root, width=45, height=15)
+    photo_field.grid(row=6, column=0, padx=(20,2))
 
-    photo_upload_field = Text(root, width=40, height=10)
-    photo_upload_field.grid(row=6, column=5)
+    photo_upload_field = Text(root, width=45, height=15)
+    photo_upload_field.grid(row=6, column=5, padx=20)
 
     comment_text = StringVar()
-    comment_label = Label(root, text='Comment', font=('bold', 14), pady=20)
-    comment_label.grid(row=0, column=0)
+    comment_label = Label(root, text='Comment', font=('bold', 14))
+    comment_label.grid(row=2, column=5)
 
     comment_entry = Entry(root, textvariable=comment_text)
-    comment_entry.grid(row=0, column=1)
+    comment_entry.grid(row=3, column=5, columnspan=2, sticky=W+E, padx=20)
 
     album_details_button = Button(root, text='View details', width=15, command=get_album_list)
-    album_details_button.grid(row=7, column=9, pady=20)
+    album_details_button.grid(row=10, column=0, pady=20)
+
+    clear_button = Button(root, text='Clear', command=clear)
+    clear_button.grid(row=5, column=5)
 
     upload_button = Button(root, text='Upload photo', command=upload_file)
-    upload_button.grid(row=8, column=9)
-
-    update_comment_button = Button(root, text='Update comment', command=update_comment)
-    update_comment_button.grid(row=9, column=9)
+    upload_button.grid(row=9, column=5)
 
     add_button = Button(root, text='add photo', command=add)
-    add_button.grid(row=10, column=9)
+    add_button.grid(row=10, column=5)
 
-    # add_photo = HTMLLabel(root, html="""
-    # <ul>
-    #     <li><a href='http://127.0.0.1:8000/album/1/photos'>Add photo</a></li>
-    # </ul>
-    # """)
-    # add_photo.grid(row=10, column=9)
+    update_comment_button = Button(root, text='Update comment', command=update_comment)
+    update_comment_button.grid(row=4, column=5)
 
-
-    photo_button = Button(root, text='Photo', command=view_photo)
-    photo_button.grid(row=1, column=0)
-
-
-
-    album_list = Listbox(root, height=15, width=45, border=1)
-    album_list.grid(row=3, column=0, columnspan=3, rowspan=9, pady=20, padx=20, sticky=NSEW)
+    album_list = Listbox(root, height=15, width=40, border=1)
+    album_list.grid(row=2, column=0, columnspan=3, rowspan=4, pady=20, padx=20, sticky=NSEW)
 
     scrollbar = Scrollbar(root, orient=VERTICAL)
     scrollbar.grid(row=4, column=2, sticky=NS)
@@ -142,6 +130,7 @@ def main_screen():
     global organizer
 
     organizer = Tk()
+    organizer.title('Photo Organizer')
 
     URL = 'http://127.0.0.1:8000/'
 
@@ -245,58 +234,56 @@ def main_screen():
 
 
     username_text = StringVar()
-    username_label = Label(organizer, text='Username', fg="red", font=('bold', 10), padx=20)
-    username_label.grid(row=0, column=8)
+    username_label = Label(organizer, text='Username', fg="red", font=('bold', 10))
+    username_label.grid(row=0, column=8, sticky=W+E)
     username_entry = Entry(organizer, textvariable=username_text)
-    username_entry.grid(row=0, column=9)
+    username_entry.grid(row=0, column=9, padx=10)
 
     password_text = StringVar()
-    password_label = Label(organizer, text='Password', fg="red", font=('bold', 10), padx=20)
-    password_label.grid(row=1, column=8)
+    password_label = Label(organizer, text='Password', fg="red", font=('bold', 10))
+    password_label.grid(row=1, column=8, sticky=W+E)
     password_entry = Entry(organizer, show="*", textvariable=password_text)
-    password_entry.grid(row=1, column=9)
+    password_entry.grid(row=1, column=9, padx=10)
 
     album_text = StringVar()
-    album_label = Label(organizer, text='Album name', font=('bold', 14), pady=20)
-    album_label.grid(row=0, column=0)
+    album_label = Label(organizer, text='Album name', font=('bold', 10))
+    album_label.grid(row=4, column=8, columnspan=2, sticky=W+E, pady=(50, 5))
 
     album_entry = Entry(organizer, textvariable=album_text)
-    album_entry.grid(row=0, column=1)
+    album_entry.grid(row=5, column=8, columnspan=2, sticky=W+E, padx=10)
 
     albumdesc_text = StringVar()
-    albumdesc_label = Label(organizer, text='Album description', font=('bold', 14))
-    albumdesc_label.grid(row=1, column=0)
+    albumdesc_label = Label(organizer, text='Album description', font=('bold', 10))
+    albumdesc_label.grid(row=6, column=8, columnspan=2, sticky=W+E)
 
     albumdesc_entry = Entry(organizer, textvariable=albumdesc_text)
-    albumdesc_entry.grid(row=1, column=1, padx=10, pady=10, ipadx=50, ipady=50)
+    albumdesc_entry.grid(row=7, column=8, columnspan=2, sticky=W+E, padx=10, pady=(5, 150))
 
-    album_list = Listbox(organizer, height=15, width=45, border=1)
-    album_list.grid(row=3, column=0, columnspan=3, rowspan=9, pady=20, padx=20, sticky=NSEW)
+    album_list = Listbox(organizer, width=50, border=1)
+    album_list.grid(row=0, column=0, columnspan=3, rowspan=11, pady=20, padx=2, sticky=NSEW)
 
     scrollbar = Scrollbar(organizer, orient=VERTICAL)
-    scrollbar.grid(row=4, column=2, sticky=NS)
+    scrollbar.grid(row=5, column=3, rowspan=6, sticky=NS)
 
     album_list.configure(yscrollcommand=scrollbar.set)
     scrollbar.configure(command=album_list.yview)
 
     album_list.bind('<<ListboxSelect>>', select)
 
-    login_button = Button(organizer, text='Login', fg='red', width=15, command=login)
+    login_button = Button(organizer, text='Login', fg='red', command=login)
     addalbum_button = Button(organizer, text='Add album', width=15, command=add)
     deletealbum_button = Button(organizer, text='Delete album', width=15, command=delete)
     updatealbum_button = Button(organizer, text='Update album', width=15, command=update)
     clear_button = Button(organizer, text='Clear', width=15, command=clear)
     album_details_button = Button(organizer, text='View album', width=15, command=album_details)
 
-    login_button.grid(row=2, column=9, pady=20)
-    addalbum_button.grid(row=3, column=9, pady=20)
-    deletealbum_button.grid(row=4, column=9, pady=20)
-    updatealbum_button.grid(row=5, column=9, pady=20)
-    clear_button.grid(row=6, column=9, pady=20)
-    album_details_button.grid(row=7, column=9, pady=20)
+    login_button.grid(row=2, column=8, columnspan=2, sticky=W+E, padx=10)
+    addalbum_button.grid(row=10, column=9)
+    deletealbum_button.grid(row=11, column=9, pady=(2, 15))
+    updatealbum_button.grid(row=10, column=8)
+    clear_button.grid(row=11, column=8, pady=(2, 15))
+    album_details_button.grid(row=11, column=0, columnspan=3, sticky=W+E, pady=(2, 15))
 
-    organizer.title('Photo Organizer')
-    organizer.geometry('800x600')
 
     organizer.mainloop()
 main_screen()
