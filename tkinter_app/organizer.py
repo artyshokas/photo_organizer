@@ -4,6 +4,7 @@ from tkinter import messagebox, filedialog
 from PIL import ImageTk
 import requests
 import json
+import os
 
 
 def album_details():
@@ -22,7 +23,7 @@ def album_details():
         view_photo()
 
     def view_photo():
-        global photo
+        global photo, selected_photo
         selected_path = selected[2]
         selected_photo = selected_path[39:]
         photo = PhotoImage(file=f"C:\\Users\\Artiom\\python_ptu5\\photo_organizer\\ptu5_organizer\\media\\user_photos\\{selected_photo}")
@@ -81,6 +82,24 @@ def album_details():
                 response = requests.put(f"http://127.0.0.1:8000/photo/{pk}/", json=data, headers=headers)
                 get_album_list()
 
+    def delete():
+        if comment_text.get(1.0, END) == '':
+            messagebox.showerror('Please fill in all fields')
+        else:
+            pk = selected[0]
+            post_files = {
+                    "photo": open(f"C:\\Users\\Artiom\\python_ptu5\\photo_organizer\\ptu5_organizer\\media\\user_photos\\{selected_photo}", "rb")
+                }
+            data = {
+                "comment": comment_text.get(1.0, END),
+                }
+            headers = {
+                "Authorization": f'Token {token}'
+                }
+            response = requests.delete(f"http://127.0.0.1:8000/photo/{pk}/", data=data, files=post_files, headers=headers)
+            print(response)
+            get_album_list()
+
     def clear():
         comment_text.delete(1.0, END)
         photo_upload_field.delete(1.0, END)
@@ -101,6 +120,9 @@ def album_details():
 
     album_details_button = Button(root, text='View details', width=15, command=get_album_list)
     album_details_button.grid(row=10, column=0, pady=20)
+
+    delete_button = Button(root, text='Delete', width=15, command=delete)
+    delete_button.grid(row=9, column=0)
 
     clear_button = Button(root, text='Clear', command=clear)
     clear_button.grid(row=5, column=5)

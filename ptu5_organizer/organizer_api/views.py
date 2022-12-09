@@ -54,7 +54,7 @@ class AlbumPhotoCommentDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def delete(self, request, *args, **kwargs):
-        photo = models.AlbumPhotoComment.objects.filter(pk=kwargs['pk'], user=self.request.user)
+        photo = models.AlbumPhotoComment.objects.filter(pk=kwargs['pk'])
         if photo.exists():
             return self.destroy(request, *args, **kwargs)
         else:
