@@ -17,8 +17,8 @@ def album_details():
         global selected
         index = album_list.curselection()[0]
         selected = album_list.get(index)
-        comment_entry.delete(0, END)
-        comment_entry.insert(END, selected[1])
+        comment_text.delete(1.0, END)
+        comment_text.insert(END, selected[1])
         view_photo()
 
     def view_photo():
@@ -49,7 +49,7 @@ def album_details():
         print(filename)
 
     def add():
-        if comment_text.get() == '':
+        if comment_text.get(1.0, END) == '':
             messagebox.showerror('Please fill in all fields')
         else:
             pk = selected[0]
@@ -57,7 +57,7 @@ def album_details():
                     "photo": open(filename, "rb")
                 }
             data = {
-                "comment": comment_text.get(),
+                "comment": comment_text.get(1.0, END),
                 }
             headers = {
                 "Authorization": f'Token {token}'
@@ -67,12 +67,12 @@ def album_details():
             get_album_list()
 
     def update_comment():
-            if comment_text.get() == '':
+            if comment_text.get(1.0, END) == '':
                 messagebox.showerror('Please fill in all fields')
             else:
                 pk = selected[0]
                 data = {
-                    "comment": comment_text.get(),
+                    "comment": comment_text.get(1.0, END),
                     }
                 headers = {
                     "Content-Type": "application/json",
@@ -82,7 +82,7 @@ def album_details():
                 get_album_list()
 
     def clear():
-        comment_entry.delete(0, END)
+        comment_text.delete(1.0, END)
         photo_upload_field.delete(1.0, END)
 
 
@@ -92,12 +92,12 @@ def album_details():
     photo_upload_field = Text(root, width=45, height=15)
     photo_upload_field.grid(row=6, column=5, padx=20)
 
-    comment_text = StringVar()
+    # comment_text = StringVar()
     comment_label = Label(root, text='Comment', font=('bold', 14))
     comment_label.grid(row=2, column=5)
 
-    comment_entry = Entry(root, textvariable=comment_text)
-    comment_entry.grid(row=3, column=5, columnspan=2, sticky=W+E, padx=20)
+    comment_text = Text(root, width=45, height=15)
+    comment_text.grid(row=3, column=5, columnspan=2, sticky=W+E, padx=20)
 
     album_details_button = Button(root, text='View details', width=15, command=get_album_list)
     album_details_button.grid(row=10, column=0, pady=20)
